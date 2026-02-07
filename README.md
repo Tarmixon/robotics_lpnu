@@ -1,0 +1,185 @@
+# Robotics Introduction Labs
+
+Hands-on labs for learning ROS2 and robotics simulation with Gazebo.
+
+---
+
+## Prerequisites
+
+- **Ubuntu 24.04** (native, WSL2, dual boot, or VirtualBox)
+- **Git** and **GitHub account** - [GitHub Hello World Guide](https://docs.github.com/en/get-started/start-your-journey/hello-world)
+- **30 GB free disk space**
+- **8 GB RAM** (16 GB recommended)
+
+**Don't have Ubuntu 24.04?** See the [Installation Guide](docs/INSTALLATION_GUIDE.md) for setup instructions.
+
+---
+
+## Setup
+
+### 1. Install Docker
+
+```bash
+# Install prerequisites
+sudo apt-get update
+sudo apt-get install -y git ca-certificates curl gnupg lsb-release
+
+# Add Docker repository
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Verify installation
+docker run hello-world
+```
+
+#### GPU Support (Optional)
+
+For better Gazebo performance with NVIDIA GPUs:
+
+```bash
+sudo apt-get install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+```
+
+### 2. Clone Repository
+
+```bash
+cd ~
+git clone https://github.com/RybOlya/robotics_lpnu.git
+cd robotics_lpnu
+```
+
+### 3. Build Docker Image
+
+```bash
+./scripts/cmd build-docker
+```
+
+This takes 10-15 minutes on first run.
+
+### 4. Run Container
+
+```bash
+./scripts/cmd run
+```
+
+
+#### Open Additional Terminals
+
+```bash
+# In a new terminal window
+./scripts/cmd bash
+```
+---
+
+## Labs
+
+| Lab | Topic | 
+|-----|-------|
+| **[Lab 1](lab1/README.md)** | Building a Robot in Gazebo | 2 sessions | Follow Gazebo tutorials to build a mobile robot with sensors |
+| **[Lab 2](lab2/README.md)** | ROS2 Integration | 2 sessions | Create ROS2 nodes, control the robot, visualize sensor data |
+
+### Workflow
+
+1. **Edit code** on your host machine (outside container) with your IDE
+2. **Build and run** inside container:
+   ```bash
+   # Inside container (you'll be at /opt/ws by default)
+   colcon build
+   source install/setup.bash
+   # Then run your commands (gz sim, ros2 launch, etc.)
+   ```
+
+### Useful Workspace Commands
+
+```bash
+# Build only specific packages
+colcon build --packages-select lab1
+
+# Build with symbolic links (faster for Python)
+colcon build --symlink-install
+
+# In case of building at wrong level for example - clean workspace (remove build artifacts)
+rm -rf ./build ./install ./log
+```
+
+**Note:** After cleaning, you must rebuild with `colcon build` before running any ROS2 commands.
+
+---
+
+## Repository Structure
+
+```
+robotics_lpnu/
+├── lab1/                          # Lab 1: Building a Robot in Gazebo
+│   ├── worlds/robot.sdf          # Robot world file
+│   └── README.md                  # Lab 1 instructions
+├── lab2/                          # Lab 2: ROS2 Integration
+│   ├── lab2/                      # Python nodes (you create)
+│   ├── launch/                    # Launch files (you create)
+│   ├── config/robot.rviz         # RViz configuration
+│   └── README.md                  # Lab 2 instructions
+├── docs/                          
+│   └── INSTALLATION_GUIDE.md      # OS setup guide
+├── docker/                        
+│   ├── Dockerfile                 # ROS2 + Gazebo image
+│   └── entrypoint.bash           
+└── scripts/                       
+    └── cmd                        # Docker helper script
+```
+
+---
+
+## Troubleshooting
+
+### Docker permission denied
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### GUI not working
+```bash
+# Linux: Allow X11 connections
+xhost +local:docker
+
+# WSL2: Update WSLg
+wsl --update
+```
+
+### Container won't start
+```bash
+docker system prune -a
+./scripts/cmd build-docker
+```
+
+### ROS2 commands not found / Package issues
+```bash
+# Try re-sourcing the environment
+source /opt/ros/jazzy/setup.bash
+source /opt/ws/install/setup.bash
+
+# Or restart the container
+exit
+./scripts/cmd run
+```
+
+---
+
+## Resources
+
+- [ROS 2 Jazzy Documentation](https://docs.ros.org/en/jazzy/)
+- [Gazebo Harmonic Documentation](https://gazebosim.org/docs/harmonic/)
+- [SDFormat Specification](http://sdformat.org/)
+- [Docker for Robotics](https://articulatedrobotics.xyz/category/docker-for-robotics)
+- [Installation Guide](docs/INSTALLATION_GUIDE.md) - OS setup
