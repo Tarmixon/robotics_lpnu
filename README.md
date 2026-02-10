@@ -35,6 +35,11 @@ This takes 10-15 minutes on first run.
 ```bash
 ./scripts/cmd run
 ```
+### 4. Install and open VScode
+
+```bash
+code .
+```
 
 
 #### Open Additional Terminals
@@ -139,6 +144,7 @@ wsl --update
 
 ### Container won't start
 ```bash
+# Remove inactive containers
 docker system prune -a
 ./scripts/cmd build-docker
 ```
