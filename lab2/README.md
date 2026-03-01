@@ -1,6 +1,6 @@
 # Лабораторна робота №2: Інтеграція ROS2 та Gazebo
 
-**Виконав:** [Ваше Ім'я / Прізвище]
+**Виконав:** [Ваше Ім'я / Прізвище] (GitHub: Tarmixon)
 **Дисципліна:** Вступ до робототехніки
 
 ---
@@ -21,7 +21,21 @@
 
 **1. Збірка пакета:**
 Увійдіть у контейнер, перейдіть у робочий простір та виконайте компіляцію:
-```bash
-cd /opt/ws
-colcon build --packages-select lab2
-source install/setup.bash
+
+    cd /opt/ws
+    colcon build --packages-select lab2
+    source install/setup.bash
+
+**2. Запуск симуляції (Термінал 1):**
+
+    ros2 launch lab2 gazebo_ros2.launch.py
+
+**3. Запуск керування рухом (Термінал 2):**
+
+    source /opt/ws/install/setup.bash
+    ros2 run lab2 robot_controller
+
+**4. Запуск читання даних лідара (Термінал 3):**
+
+    source /opt/ws/install/setup.bash
+    ros2 run lab2 lidar_subscriber
