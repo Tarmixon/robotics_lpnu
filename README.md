@@ -57,6 +57,7 @@ code .
 | **[Lab 1](lab1/README.md)** | Introduction to ROS2 and Simulation | Create 4-wheel mobile robot with sensors |
 | **[Lab 2](lab2/README.md)** | Adding Objects to Simulation | Create and position objects in Gazebo |
 | **[Lab 3](lab3/README.md)** | Moving Mobile Robots in Simulation | Differential drive kinematics, geometric paths. You also need to run the TurtleBot3 setup - will be used in the next lab. |
+| **[Lab 4](lab4/README.md)** | Dead Reckoning | Integrate velocity commands, compare with Gazebo odometry. Runs with lab3 circle trajectory. |
 
 ### Development Workflow
 
