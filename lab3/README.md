@@ -1,43 +1,41 @@
-# Laboratory Work 3: Robot Motion Control
+Laboratory Work 3: Path Following and Trajectory Control
+Overview
+This repository contains the solution for Lab 3. It explores differential drive kinematics and trajectory control in ROS2 and Gazebo. The lab includes executing predefined paths (square, circle) and a custom implemented figure-8 trajectory. It also introduces the standard TurtleBot3 robot in a simulated room environment.
 
-## Overview
-This package implements various motion control strategies for a 4-wheeled differential drive robot in a ROS 2 / Gazebo environment. The focus is on implementing both timed (open-loop) and odometry-based (closed-loop) trajectories.
-## Implemented Trajectories
+Quick Start Guide
+Step 1: Start the Environment
+Open your terminal in the root directory and start the Docker container:
 
-### 1. Circular Path (circle_path.py)
-- **Control Type:** Open-loop (timed).
-- **Logic:** Calculates the time required to complete a 360-degree turn based on the angular velocity ($T = 2\pi / \omega$).
-- **Launch:** ```bash
-ros2 run lab3 circle_path
-### 2. Square Path (square_path.py)
-- **Control Type:** Closed-loop (Odometry feedback).
-- **Logic:** Uses real-time data from the `/model/vehicle_blue/odometry` topic. It monitors position (x, y) to travel a specific side length and orientation (yaw) to perform precise 90-degree turns.
-- **Launch:**
-```bash
-ros2 run lab3 square_path --ros-args -p linear_speed:=0.2 -p angular_speed:=0.25
-### 3. Figure-8 Path (figure_8_path.py)
-- **Control Type:** Combined timed motion.
-- **Logic:** Executes two consecutive circles in opposite directions (clockwise and counter-clockwise) to form a "figure-eight" shape.
-- **Launch:**
-```bash
-ros2 run lab3 figure_8_path
-## Setup and Installation
+./scripts/cmd run
+Step 2: Build the Workspace
+Inside the container, compile the lab3 package and source the workspace:
 
-1. **Build the package:**
-   ```bash
-   cd /opt/ws
-   colcon build --packages-select lab3
-   source install/setup.bash
-### Section 6: Visualization and Technical Details
-```markdown
-## Visualization in RViz2
-To visualize the robot's actual path:
-1. Ensure the **Fixed Frame** is set to `vehicle_blue/odom`.
-2. Ensure the **Path** display is active and subscribed to the `/path` topic.
-3. Use the **Reset** button in the bottom-left corner of RViz2 to clear previous trajectories.
+cd /opt/ws
+colcon build --packages-select lab3
+source install/setup.bash
+Step 3: Launch Simulation (Terminal 1)
+Launch the Gazebo room environment with TurtleBot3 and RViz2 for visualization:
 
-## Technical Details
-- **Message Type:** `geometry_msgs/TwistStamped`
-- **Odometry Topic:** `/model/vehicle_blue/odometry`
-- **Coordinate System:** REP-105 compliant (base_link, odom).
-- **Robot Model:** Custom 4-wheeled vehicle defined in `robot.sdf`.
+ros2 launch lab3 turtlebot3_room_bringup.launch.py
+Step 4: Run Trajectories (Terminal 2)
+Open a new terminal, enter the container (./scripts/cmd bash), source the setup file, and run one of the desired paths:
+
+1. Square Path (using Odometry):
+source /opt/ws/install/setup.bash
+ros2 run lab3 square_path --ros-args -p odom_topic:=/odom
+2. Figure-8 Path (Custom Implementation):
+Runs a timed sequence of two circles. Slower speeds and a time multiplier (e.g., 1.37) are used to compensate for Gazebo's Real-Time Factor (RTF) physics delays and motor limits:
+
+source /opt/ws/install/setup.bash
+ros2 run lab3 figure_8_path --ros-args -p linear_speed:=0.15 -p angular_speed:=0.3
+Key Implementations
+figure_8_path.py: A custom ROS2 node that publishes TwistStamped messages to /cmd_vel to draw a figure-8 shape. It handles physical motor limitations and compensates for simulation time delays (RTF < 1.0).
+
+RViz2 Trajectory Tracking: The odom_path_publisher node translates odometry data into a Path message, allowing real-time trajectory drawing in RViz2.
+
+Troubleshooting
+Robot does not move ("Waiting for odometry..."): Ensure you are passing the correct odometry topic for TurtleBot3 (--ros-args -p odom_topic:=/odom).
+
+Console spam TF_OLD_DATA: This happens when restarting the Gazebo simulation while RViz2 is still open. Click the "Reset" button in the bottom left corner of the RViz2 window.
+
+Robot disappears or flies away: The robot likely hit a wall at high speed, breaking the physics engine. Restart the ros2 launch command.
