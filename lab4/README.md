@@ -1,53 +1,25 @@
-# Lab 4: Dead Reckoning
+# Laboratory Work 4: Dead Reckoning Analysis
 
-## Learning Goals
+## Overview
+This package implements the **Dead Reckoning** navigation method for a differential drive robot. The goal is to calculate the robot's pose (position and orientation) by integrating velocity commands over time and comparing this mathematical model with the ground truth data from Gazebo.
 
-- Integrate velocity commands to estimate pose (dead reckoning)
-- Compare with Gazebo ground truth
-- Understand drift
+## Dead Reckoning Logic
+The position is updated in real-time using kinematic equations:
+- $x_{new} = x_{old} + v \cdot \cos(\theta) \cdot \Delta t$
+- $y_{new} = y_{old} + v \cdot \sin(\theta) \cdot \Delta t$
+- $\theta_{new} = \theta_{old} + \omega \cdot \Delta t$
 
-**Reference:** [Motion Model for Differential Drive](https://www.roboticsbook.org/S52_diffdrive_actions.html)
+## Drift Analysis (Why the arrow is far from the robot)
+During the experiments, a significant drift (error accumulation) was observed. The "Ideal Pose" (arrow in RViz) diverges from the actual robot trajectory because:
+1. **Discrete Integration:** We assume velocity is constant during $\Delta t$, which is an approximation.
+2. **Physical Factors:** Gazebo simulates wheel slip and friction, which the mathematical model doesn't account for.
+3. **Latency:** There is a delay between sending a command and the physical response of the robot.
 
----
-
-## Setup
-
-```bash
-cd /opt/ws
-colcon build --packages-select lab3 lab4
-source install/setup.bash
-```
-
----
-
-## Task
-
-### 1. Implement dead reckoning
-
-Edit `lab4/dead_reckoning.py` — implement the TODO. Use the reference above for the pose update from `(v, ω)`.
-
-### 2. Launch TurtleBot3
-
-**Terminal 1:**
-```bash
-ros2 launch lab4 dead_reckoning_bringup.launch.py
-```
-
-### 3. Run circle trajectory
-
-**Terminal 2:**
-```bash
-ros2 run lab3 circle_path
-```
-
-### 4. Observe
-
-RViz shows two paths: odom (ground truth) and dead reckoning. Terminal logs error.
-
----
-
-## Deliverables
-
-1. Implemented `dead_reckoning.py`
-2. Screenshot of both paths in RViz
-3. Brief answer: Why does dead reckoning drift?
+## Execution
+1. **Build the package:**
+   ```bash
+   colcon build --packages-select lab4
+   source install/setup.bash
+2. **Launch**
+    ```bash
+    ros2 launch lab4 dead_reckoning_bringup.launch.py
