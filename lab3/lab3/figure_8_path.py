@@ -29,7 +29,7 @@ class Figure8Path(Node):
         dt = 1.0 / max(float(self.get_parameter("rate_hz").value), 1.0)
 
         # Розраховуємо час, необхідний для проходження одного кола (T = 2*pi / w)
-        duration = 2.0 * math.pi / max(abs(w), 1e-6)
+        duration = (2.0 * math.pi / abs(w)) * 1.1
         
         self.get_logger().info(f"Починаємо рух по вісімці! v={v:.2f}, w={w:.2f}")
 
